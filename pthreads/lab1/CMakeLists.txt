@@ -1,1 +1,1 @@
-add_executable(lab1 main.c)
+add_executable(lab1 main.c row_mult.c)
