@@ -1,3 +1,5 @@
 #pragma once
+#include <stdio.h>
+#include <time.h>
 
-void run_row_mult();
+clock_t run_row_mult_test(FILE *in_file, FILE *out_file);
