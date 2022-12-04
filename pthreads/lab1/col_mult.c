@@ -12,13 +12,16 @@ typedef struct {
 
 double col_mult(col_data_t *data) {
   double result[4] = {0};
-  double prom_result = 0;
-  for (int j = 0; j < data->n; ++j) {
-    for (int i = 0; i < data->n; ++i) {
-      result[i] = result[i] + data->prow[i][j] * data->pvec[j];
+  for (int i = 0; i < data->n; ++i) {
+    for (int j = 0; j < data->n; ++j) {
+      result[j] = result[j] + data->prow[j][i] * data->pvec[i];
     }
   }
-  return result[0];
+  printf("\nresult: ");
+  for (int i = 0; i < data->n; ++i) {
+    printf("%.2lf ", result[i]);
+  }
+  printf("\n");
 }
 
 void *col_mult_routine(void *data) {
@@ -53,7 +56,7 @@ void run_col_mult() {
     exit(1);
   }
 
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < 1; i++) {
     data[i].n = n;
     for (int j = 0; j < n; j++) {
       data[i].prow[j] = &mat[j*n];
@@ -67,9 +70,7 @@ void run_col_mult() {
     pthread_join(handles[i], NULL);
   }
 
-  printf("\nresult: ");
   for (int i = 0; i < n; ++i) {
-    printf("%.2lf ", data[i].result);
+    data[i].result;
   }
-  printf("\n");
 } 
