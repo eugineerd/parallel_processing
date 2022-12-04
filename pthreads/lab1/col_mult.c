@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 typedef struct {
-  double *prow[4];
+  double *prow;
   double *pvec;
   size_t n;
 
@@ -11,10 +11,10 @@ typedef struct {
 } col_data_t;
 
 double col_mult(col_data_t *data) {
-  double result[4] = {0};
+  double *result = malloc(data->n * sizeof(double));
   for (int i = 0; i < data->n; ++i) {
     for (int j = 0; j < data->n; ++j) {
-      result[j] = result[j] + data->prow[j][i] * data->pvec[i];
+      result[j] = result[j] + data->prow[j*data->n + i] * data->pvec[i];
     }
   }
   printf("\nresult: ");
@@ -58,9 +58,7 @@ void run_col_mult() {
 
   for (int i = 0; i < 1; i++) {
     data[i].n = n;
-    for (int j = 0; j < n; j++) {
-      data[i].prow[j] = &mat[j*n];
-    }
+    data[i].prow = mat;
     data[i].pvec = vec;
     pthread_create(&handles[i], NULL, (void *(*)(void *)) & col_mult_routine,
                    &data[i]);
@@ -69,8 +67,8 @@ void run_col_mult() {
   for (int i = 0; i < n; i++) {
     pthread_join(handles[i], NULL);
   }
-
+  
   for (int i = 0; i < n; ++i) {
     data[i].result;
   }
-} 
+}
