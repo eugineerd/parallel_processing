@@ -7,26 +7,25 @@ typedef struct {
   double *pvec;
   size_t n;
 
-  double result;
+  double *result;
 } col_data_t;
 
-double col_mult(col_data_t *data) {
+double *col_mult(col_data_t *data) {
   double *result = malloc(data->n * sizeof(double));
   for (int i = 0; i < data->n; ++i) {
     for (int j = 0; j < data->n; ++j) {
       result[j] = result[j] + data->prow[j*data->n + i] * data->pvec[i];
     }
   }
-  printf("\nresult: ");
-  for (int i = 0; i < data->n; ++i) {
-    printf("%.2lf ", result[i]);
-  }
-  printf("\n");
+  return result;
 }
 
 void *col_mult_routine(void *data) {
   col_data_t *data_ = (col_data_t *)data;
-  data_->result = col_mult(data_);
+  data_->result = malloc(data_->n * sizeof(double));
+  for (int i = 0; i < data_->n; ++i) {
+    data_->result = col_mult(data_);
+  }
   return NULL;
 }
 
@@ -56,7 +55,7 @@ void run_col_mult() {
     exit(1);
   }
 
-  for (int i = 0; i < 1; i++) {
+  for (int i = 0; i < n; i++) {
     data[i].n = n;
     data[i].prow = mat;
     data[i].pvec = vec;
@@ -71,4 +70,9 @@ void run_col_mult() {
   for (int i = 0; i < n; ++i) {
     data[i].result;
   }
+  printf("\nresult: ");
+  for (int i = 0; i < data->n; ++i) {
+    printf("%.2lf ", data[i].result[i]);
+  }
+  printf("\n");
 }
