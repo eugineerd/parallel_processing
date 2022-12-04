@@ -11,11 +11,12 @@ typedef struct {
 } col_data_t;
 
 double *col_mult(col_data_t *data) {
-  double *result = malloc(data->n * data->n *sizeof(double));
+  double *result = malloc(data->n * data->n * sizeof(double));
   for (int i = 0; i < data->n; ++i) {
     for (int j = 0; j < data->n; ++j) {
       for (int q = 0; q < data->n; ++q) {
-      result[q+i*data->n] += data->pvec[q*data->n + j] * data->prow[j*data->n + i];
+        result[q + i * data->n] +=
+            data->pvec[q * data->n + j] * data->prow[j * data->n + i];
       }
     }
   }
@@ -32,8 +33,9 @@ void *col_mult_routine(void *data) {
 }
 
 void run_col_mult() {
-  int n;
+  int n, m;
   scanf("%d", &n);
+  scanf("%d", &m);
 
   double *vec = malloc(n * n * sizeof(double));
   double *mat = malloc(n * n * sizeof(double));
@@ -46,6 +48,11 @@ void run_col_mult() {
       scanf("%lf", &vec[i * n + j]);
     }
   }
+
+  int _, __;
+  scanf("%d", &_);
+  scanf("%d", &__);
+
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < n; ++j) {
       scanf("%lf", &mat[i * n + j]);
@@ -73,7 +80,7 @@ void run_col_mult() {
   for (int i = 0; i < n; ++i) {
     data[i].result;
   }
-  
+
   /*printf("\nresult: ");
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < n; ++j) {
@@ -87,18 +94,18 @@ void run_col_mult() {
   printf("\n");*/
 }
 
-
 #include "col_mult.h"
-#include <time.h>
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <time.h>
 
-int main() { 
+int main() {
   struct timespec start, end;
   clock_gettime(CLOCK_MONOTONIC_RAW, &start);
   run_col_mult();
   clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-  uint64_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+  uint64_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 +
+                      (end.tv_nsec - start.tv_nsec) / 1000;
   printf("%ld", delta_us);
   return 0;
 }
