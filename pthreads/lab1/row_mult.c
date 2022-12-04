@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 matrix_t mat_a;
 matrix_t mat_b;
@@ -14,21 +15,24 @@ matrix_t mat_b;
 matrix_t result;
 
 typedef struct {
-  uint32_t mat_a_row;
-  uint32_t mat_b_col;
+  uint32_t mat_a_row_start;
+  uint32_t n_rows;
 } row_mult_workload_t;
 
 void row_mult(row_mult_workload_t *data) {
-  uint32_t row_idx = data->mat_a_row;
-  uint32_t col_idx = data->mat_b_col;
-  matrix_data_t sum = 0;
-  for (int j = 0; j < mat_a.m; ++j) {
-    sum += matrix_get(&mat_a, row_idx, j) * matrix_get(&mat_b, j, col_idx);
+  for (int row_idx = data->mat_a_row_start;
+       row_idx < data->n_rows + data->mat_a_row_start; ++row_idx) {
+    for (int i = 0; i < result.m; ++i) {
+      matrix_data_t sum = 0;
+      for (int j = 0; j < result.n; ++j) {
+        sum += matrix_get(&mat_a, row_idx, j) * matrix_get(&mat_b, j, i);
+      }
+      matrix_set(&result, row_idx, i, sum);
+    }
   }
-  matrix_set(&result, row_idx, col_idx, sum);
 }
 
-clock_t run_row_mult_test(FILE *in_file, FILE *out_file) {
+clock_t run_row_mult_test(FILE *in_file, FILE *out_file, uint32_t num_threads) {
   mat_a = matrix_read(in_file);
   mat_b = matrix_read(in_file);
 
@@ -40,36 +44,64 @@ clock_t run_row_mult_test(FILE *in_file, FILE *out_file) {
 
   result = matrix_new_uninit(mat_a.n, mat_b.m);
 
-  pthread_t *handles = malloc(result.n * result.m * sizeof(pthread_t));
+  pthread_t *handles = malloc((num_threads + 1) * sizeof(pthread_t));
   row_mult_workload_t *data =
-      malloc(result.n * result.m * sizeof(row_mult_workload_t));
+      malloc((num_threads + 1) * sizeof(row_mult_workload_t));
   if (!handles || !data) {
     fprintf(stderr, "Failed to allocate memory for pthread workload\n");
     exit(1);
   }
 
-  clock_t start = clock() / (CLOCKS_PER_SEC / 1000);
-  for (int i = 0; i < result.n; i++) {
-    for (int j = 0; j < result.m; j++) {
-      size_t workload_idx = result.m * i + j;
-      data[workload_idx].mat_a_row = i;
-      data[workload_idx].mat_b_col = j;
-      pthread_create(&handles[workload_idx], NULL,
-                     (void *(*)(void *)) & row_mult, &data[workload_idx]);
-    }
-  }
+  uint32_t n_per_thread = result.n / num_threads;
+  uint32_t n_leftover = result.n % num_threads;
 
-  for (int i = 0; i < result.n * result.m; i++) {
+  struct timespec start, end;
+  clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+
+  for (int i = 0; i < num_threads; ++i) {
+    data[i].mat_a_row_start = i * n_per_thread;
+    data[i].n_rows = n_per_thread;
+    pthread_create(&handles[i], NULL, (void *(*)(void *)) & row_mult, &data[i]);
+  }
+  if (n_leftover) {
+    data[num_threads].mat_a_row_start = n_per_thread * num_threads;
+    data[num_threads].n_rows = n_leftover;
+    pthread_create(&handles[num_threads], NULL, (void *(*)(void *)) & row_mult,
+                   &data[num_threads]);
+  }
+  for (int i = 0; i < num_threads; i++) {
     pthread_join(handles[i], NULL);
   }
-  clock_t time_diff = clock() / (CLOCKS_PER_SEC / 1000) - start;
+  if (n_leftover) {
+    pthread_join(handles[num_threads], NULL);
+  }
+
+  clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+  uint64_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 +
+                      (end.tv_nsec - start.tv_nsec) / 1000;
 
   fprintf(out_file, "\nresult: \n");
   for (int i = 0; i < result.n; ++i) {
     for (int j = 0; j < result.m; ++j) {
       fprintf(out_file, "%6.2lf ", matrix_get(&result, i, j));
     }
-    fputs("", out_file);
+    fputs("\n", out_file);
   }
-  return time_diff;
+  return delta_us;
+}
+
+int main(int argc, char *argv[]) {
+  if (argc != 4) {
+    printf("args: <in_file> <out_file> <num_threads>\n");
+    exit(0);
+  }
+
+  FILE *in_file = fopen(argv[1], "r");
+  FILE *out_file = fopen(argv[2], "w");
+
+  clock_t run_time = run_row_mult_test(in_file, out_file, atoi(argv[3]));
+  printf("%ld", run_time);
+
+  fclose(in_file);
+  fclose(out_file);
 }
