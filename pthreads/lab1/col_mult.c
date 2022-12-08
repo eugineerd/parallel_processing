@@ -6,6 +6,7 @@ typedef struct {
   double *prow;
   double *pvec;
   size_t n;
+  size_t m;
 
   double *result;
 } col_data_t;
@@ -14,7 +15,7 @@ double *col_mult(col_data_t *data) {
   double *result = malloc(data->n * data->n *sizeof(double));
   for (int i = 0; i < data->n; ++i) {
     for (int j = 0; j < data->n; ++j) {
-      for (int q = 0; q < data->n; ++q) {
+      for (int q = 0; q < data->m; ++q) {
       result[q+i*data->n] += data->pvec[q*data->n + j] * data->prow[j*data->n + i];
       }
     }
@@ -32,8 +33,11 @@ void *col_mult_routine(void *data) {
 }
 
 void run_col_mult() {
-  int n;
+  int n, m, p;
+  scanf("%d", &p);
   scanf("%d", &n);
+  scanf("%d", &m);
+
 
   double *vec = malloc(n * n * sizeof(double));
   double *mat = malloc(n * n * sizeof(double));
@@ -60,6 +64,7 @@ void run_col_mult() {
 
   for (int i = 0; i < n; i++) {
     data[i].n = n;
+    data[i].m = m;
     data[i].prow = mat;
     data[i].pvec = vec;
     pthread_create(&handles[i], NULL, (void *(*)(void *)) & col_mult_routine,
@@ -70,11 +75,11 @@ void run_col_mult() {
     pthread_join(handles[i], NULL);
   }
 
-  for (int i = 0; i < n; ++i) {
+  for (int i = 0; i < p; ++i) {
     data[i].result;
   }
   
-  /*printf("\nresult: ");
+  printf("\nresult: ");
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < n; ++j) {
       if (j % n == 0) {
@@ -84,7 +89,7 @@ void run_col_mult() {
     }
     printf("\n");
   }
-  printf("\n");*/
+  printf("\n");
 }
 
 
