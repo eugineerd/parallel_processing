@@ -4,12 +4,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 times = []
-sizes =[(4, 200), (10, 200), (20, 200), (50, 200), (100, 200), (250, 20), (1000, 3)] 
+sizes =[(4, 200), (10, 200), (20, 200), (50, 200), (100, 200), (250, 20), (1000, 3)]
 threads = [1, 2, 4, 8, 16, 32]
-plt.rcParams["figure.figsize"] = (30,50)
-fig, ax = plt.subplots(3, len(sizes))
+plt.rcParams["figure.figsize"] = (40,24)
 
-for l, alg in enumerate(["col_mult", "row_mult"]):
+for l, alg in enumerate(["row_mult", "col_mult"]):
+    fig, ax = plt.subplots(3, len(sizes))
     for size_n, (m, r) in enumerate(sizes):
         times = []
         for i, t in enumerate(threads):
@@ -24,9 +24,23 @@ for l, alg in enumerate(["col_mult", "row_mult"]):
                 ff.write(out)
             print(out, end="")
             times.append(time)
-        ax[l][size_n].set_title(f"{alg}, {m}x{m} matrix")
-        ax[l][size_n].set_xlabel("num threads")
-        ax[l][size_n].set_yscale("log")
-        ax[l][size_n].set_ylabel("time, ms")
-        sns.lineplot(y=times, x=[f"{x} threads" for x in threads], ax=ax[l][size_n])
-fig.savefig("out.png", bbox_inches='tight')
+        times_ax = ax[0][size_n] 
+        times_ax.set_title(f"Time, {alg}, {m}x{m} matrix")
+        times_ax.set_xlabel("num threads")
+        times_ax.set_yscale("log")
+        times_ax.set_ylabel("time, ms")
+        sns.lineplot(y=times, x=[f"{x}" for x in threads], ax=times_ax)
+
+        speedup_ax = ax[1][size_n] 
+        speedup_ax.set_title(f"Speedup, {alg}, {m}x{m} matrix")
+        speedup_ax.set_xlabel("num threads")
+        speedup_ax.set_ylabel("times")
+        speedups = [times[0]/x for x in times]
+        sns.lineplot(y=speedups, x=[f"{x}" for x in threads], ax=speedup_ax)
+
+        efficiency_ax = ax[2][size_n] 
+        efficiency_ax.set_title(f"Efficiency, {alg}, {m}x{m} matrix")
+        efficiency_ax.set_xlabel("num threads")
+        efficiency_ax.set_ylabel("times")
+        sns.lineplot(y=[x/y for x, y in zip(speedups, threads)], x=[f"{x}" for x in threads], ax=efficiency_ax)
+    fig.savefig(f"{alg}.png", bbox_inches='tight')
