@@ -57,7 +57,6 @@ void *decomposition_worker(void *args) {
   for (size_t i = 0; i < data->num_threads; ++i) {
     for (size_t j = i * step;
          i == tread_idx && j < (i + 1) * step && j < data->u_idx; ++j) {
-      // std::cout << "u :" << k << " a: " << row << '\n';
       matrix_t proj = proj_u(data->A, data->Q, j, data->u_idx);
       for (int k = 0; k < data->V->m; ++k) {
         matrix_set(data->V, j, k, matrix_get(&proj, k, 0));
@@ -80,7 +79,6 @@ void *summation_worker(void *args) {
   for (size_t i = 0; i < data->num_threads; ++i) {
     for (size_t j = i * step; i == tread_idx && j < (i + 1) * step && j < M;
          ++j) {
-      // std::cout << "u :" << k << " a: " << row << '\n';
       for (size_t e = 0; e < data->u_idx; ++e) {
         matrix_data_t tmp = matrix_get(data->Q, data->u_idx, j);
         tmp -= matrix_get(data->V, e, j);
@@ -129,7 +127,6 @@ void *multiply_worker(void *args) {
     for (size_t j = i * step; i == tread_idx && j < (i + 1) * step && j < M;
          ++j) {
       for (size_t k = 0; k < N; ++k) {
-        // std::cout << "j: " << j << " k: " << k << "\n";
         for (size_t e = 0; e < data->A->m; ++e) {
           matrix_data_t tmp = matrix_get(data->R, j, e);
           tmp += matrix_get(data->Q, j, k) * matrix_get(data->A, k, e);
@@ -183,9 +180,6 @@ clock_t decompose(matrix_t *m, size_t MAX_THREAD) {
       s += matrix_get(args.Q, args.u_idx, e);
     }
     if (fabs(s) < EPSILON) {
-      //   N = u + 1;
-      //   Q->resize(u + 1);
-      //   R->resize(u + 1);
       break;
     }
   }
