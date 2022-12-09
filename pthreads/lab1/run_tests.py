@@ -8,7 +8,7 @@ sizes =[(4, 200), (10, 200), (20, 200), (50, 200), (100, 200), (250, 20), (1000,
 threads = [1, 2, 4, 8, 16, 32]
 plt.rcParams["figure.figsize"] = (40,24)
 
-for l, alg in enumerate(["row_mult", "col_mult"]):
+for l, alg in enumerate(["qr_decomposition", "row_mult", "col_mult"]):
     fig, ax = plt.subplots(3, len(sizes))
     for size_n, (m, r) in enumerate(sizes):
         times = []
