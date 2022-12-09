@@ -52,3 +52,13 @@ matrix_t matrix_new_uninit(size_t n, size_t m) {
   matrix_t mat = {.data = data, .m = m, .n = n};
   return mat;
 }
+
+matrix_t matrix_new_zero(size_t n, size_t m) {
+  matrix_data_t *data = calloc(n * m, sizeof(matrix_data_t));
+  if (!data) {
+    fprintf(stderr, "Failed to allocate %ld bytes\n", n * m);
+    exit(ENOMEM);
+  }
+  matrix_t mat = {.data = data, .m = m, .n = n};
+  return mat;
+}
