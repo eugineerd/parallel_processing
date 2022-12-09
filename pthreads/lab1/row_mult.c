@@ -1,4 +1,3 @@
-#include "row_mult.h"
 #include "matrix.h"
 #include <errno.h>
 #include <pthread.h>
