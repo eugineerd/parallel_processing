@@ -1,0 +1,54 @@
+N=3
+ Singlethreaded time: 106.935 ns
+ Multithreaded time: 10245.9805 ns
+  Speedup multi: 0.010436775670225022
+ Compute time: 165496.28376 ns
+  Speedup compute: 0.000646147439510336
+N=10
+ Singlethreaded time: 457.679 ns
+ Multithreaded time: 14044.8157 ns
+  Speedup multi: 0.03258704206421164
+ Compute time: 171425.6864 ns
+  Speedup compute: 0.0026698390982787977
+N=50
+ Singlethreaded time: 6872.225 ns
+ Multithreaded time: 23214.5069 ns
+  Speedup multi: 0.29603148710429855
+ Compute time: 214830.07746 ns
+  Speedup compute: 0.031989119406613656
+N=200
+ Singlethreaded time: 111909.333 ns
+ Multithreaded time: 54495.5485 ns
+  Speedup multi: 2.0535499885830126
+ Compute time: 437871.00244 ns
+  Speedup compute: 0.25557603124297906
+N=1000
+ Singlethreaded time: 2738469.35 ns
+ Multithreaded time: 701472.435 ns
+  Speedup multi: 3.9038873280886652
+ Compute time: 1185496.4546 ns
+  Speedup compute: 2.309976836602173
+N=3000
+ Singlethreaded time: 24868664.67 ns
+ Multithreaded time: 6053372.081 ns
+  Speedup multi: 4.108233285057172
+ Compute time: 2028345.646 ns
+  Speedup compute: 12.260565510144813
+N=5000
+ Singlethreaded time: 68483055.49 ns
+ Multithreaded time: 16718521.415 ns
+  Speedup multi: 4.096238763588054
+ Compute time: 3506268.4062 ns
+  Speedup compute: 19.531606698706817
+N=10000
+ Singlethreaded time: 277482258.8 ns
+ Multithreaded time: 66383066.37 ns
+  Speedup multi: 4.180015687334993
+ Compute time: 13391502.058 ns
+  Speedup compute: 20.7207718445769
+N=20000
+ Singlethreaded time: 1097814063 ns
+ Multithreaded time: 265405224.65 ns
+  Speedup multi: 4.136369449575566
+ Compute time: 53999061.524 ns
+  Speedup compute: 20.330243378620093
